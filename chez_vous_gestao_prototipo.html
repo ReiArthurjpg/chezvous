@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chez Vous Gestão — Protótipo</title>
+<style>
+:root{
+  --navy:#10263a;
+  --navy-2:#17364f;
+  --navy-3:#214966;
+  --gold:#d8b15d;
+  --gold-soft:#f3e7c6;
+  --cream:#f8f5ee;
+  --paper:#ffffff;
+  --ink:#1c2935;
+  --muted:#6d7b88;
+  --line:#dde4e8;
+  --green:#2f8f68;
+  --green-bg:#e9f6ef;
+  --orange:#c97824;
+  --orange-bg:#fff3e4;
+  --red:#bd4d55;
+  --red-bg:#fdecee;
+  --blue:#3e78a6;
+  --blue-bg:#eaf3fa;
+  --purple:#7567a8;
+  --purple-bg:#f0edf9;
+  --shadow:0 12px 35px rgba(18,38,55,.09);
+  --radius:18px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:Inter,Segoe UI,Arial,sans-serif;
+  background:#eef2f3;
+  color:var(--ink);
+}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app{display:flex;min-height:100vh}
+.sidebar{
+  width:260px;background:var(--navy);color:#fff;position:fixed;inset:0 auto 0 0;
+  display:flex;flex-direction:column;z-index:20;
+}
+.brand{padding:26px 24px 22px;border-bottom:1px solid rgba(255,255,255,.1)}
+.brand-mark{display:flex;gap:12px;align-items:center}
+.logo{
+  width:42px;height:42px;border-radius:14px;background:var(--gold);
+  display:grid;place-items:center;color:var(--navy);font-weight:900;letter-spacing:-1px;
+}
+.brand h1{font-size:18px;margin:0}.brand small{color:#b8c7d3}
+.nav{padding:16px 12px;display:flex;flex-direction:column;gap:5px;overflow:auto}
+.nav button{
+  width:100%;border:0;background:transparent;color:#c8d5df;padding:11px 12px;
+  border-radius:12px;display:flex;align-items:center;gap:12px;text-align:left;
+}
+.nav button:hover,.nav button.active{background:rgba(255,255,255,.1);color:white}
+.nav .icon{width:24px;text-align:center}
+.sidebar-footer{margin-top:auto;padding:18px 20px;border-top:1px solid rgba(255,255,255,.1);font-size:12px;color:#9fb1c0}
+.main{margin-left:260px;width:calc(100% - 260px)}
+.topbar{
+  height:74px;background:rgba(255,255,255,.94);backdrop-filter:blur(9px);
+  border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;
+  padding:0 30px;position:sticky;top:0;z-index:15;
+}
+.page-title{font-size:22px;font-weight:800}
+.top-actions{display:flex;align-items:center;gap:12px}
+.search{
+  width:280px;border:1px solid var(--line);background:#f7f9fa;border-radius:12px;
+  padding:10px 13px;color:var(--ink)
+}
+.icon-btn{
+  width:40px;height:40px;border:1px solid var(--line);background:white;border-radius:12px;
+  display:grid;place-items:center;position:relative
+}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--red);position:absolute;right:8px;top:7px}
+.avatar{width:40px;height:40px;border-radius:50%;background:var(--gold-soft);color:var(--navy);display:grid;place-items:center;font-weight:800}
+.content{padding:26px 30px 44px}
+.view{display:none}.view.active{display:block}
+.hero{
+  background:linear-gradient(135deg,var(--navy),var(--navy-3));color:white;border-radius:22px;
+  padding:24px 26px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow);margin-bottom:22px
+}
+.hero h2{font-size:24px;margin:0 0 7px}.hero p{margin:0;color:#c8d6df}
+.btn{
+  border:0;border-radius:11px;padding:10px 14px;font-weight:700;background:var(--navy);color:white
+}
+.btn.secondary{background:white;color:var(--navy);border:1px solid var(--line)}
+.btn.gold{background:var(--gold);color:var(--navy)}
+.btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.3);color:#fff}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.card{
+  background:white;border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:0 4px 16px rgba(25,45,60,.04)
+}
+.kpi{display:flex;align-items:center;justify-content:space-between}
+.kpi .num{font-size:31px;font-weight:900;letter-spacing:-1px}
+.kpi .label{font-size:13px;color:var(--muted);margin-bottom:5px}
+.kpi .badge-icon{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;font-size:22px}
+.bg-green{background:var(--green-bg);color:var(--green)}
+.bg-orange{background:var(--orange-bg);color:var(--orange)}
+.bg-red{background:var(--red-bg);color:var(--red)}
+.bg-blue{background:var(--blue-bg);color:var(--blue)}
+.bg-purple{background:var(--purple-bg);color:var(--purple)}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin:24px 0 12px}
+.section-head h3{margin:0;font-size:17px}
+.section-head .sub{font-size:12px;color:var(--muted)}
+.pill{padding:6px 9px;border-radius:999px;font-size:11px;font-weight:800;display:inline-block}
+.pill.green{background:var(--green-bg);color:var(--green)}
+.pill.orange{background:var(--orange-bg);color:var(--orange)}
+.pill.red{background:var(--red-bg);color:var(--red)}
+.pill.blue{background:var(--blue-bg);color:var(--blue)}
+.pill.gray{background:#eff2f4;color:#66737e}
+.pill.purple{background:var(--purple-bg);color:var(--purple)}
+table{width:100%;border-collapse:collapse}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);text-align:left;padding:11px;border-bottom:1px solid var(--line)}
+td{font-size:13px;padding:13px 11px;border-bottom:1px solid #edf1f3;vertical-align:middle}
+tr:last-child td{border-bottom:0}
+.progress{height:8px;background:#edf0f2;border-radius:99px;overflow:hidden}
+.progress>span{display:block;height:100%;background:var(--green);border-radius:99px}
+.event-card{padding:17px;border:1px solid var(--line);border-radius:15px;background:white;transition:.2s}
+.event-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.event-top{display:flex;justify-content:space-between;gap:12px}
+.event-title{font-weight:800}.event-meta{font-size:12px;color:var(--muted);margin-top:4px}
+.event-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.mini-stat{background:#f7f9fa;border-radius:11px;padding:9px}.mini-stat b{display:block;font-size:14px}.mini-stat span{font-size:10px;color:var(--muted)}
+.timeline{display:flex;gap:8px;align-items:center;overflow:auto;padding-bottom:6px}
+.stage{min-width:145px;border:1px solid var(--line);border-radius:14px;background:white;padding:12px;position:relative}
+.stage.done{border-color:#bcdcca;background:#f7fcf9}
+.stage.active{border-color:#ecd39e;background:#fffaf0}
+.stage.locked{opacity:.55}
+.stage small{display:block;color:var(--muted);margin-bottom:5px}.stage b{font-size:12px}
+.arrow{color:#96a4ae;font-size:20px}
+.task-item{
+  display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #edf1f3
+}
+.task-item:last-child{border:0}
+.check{
+  width:22px;height:22px;border:2px solid #c7d0d6;border-radius:7px;background:white;display:grid;place-items:center;color:white
+}
+.task-item.done .check{background:var(--green);border-color:var(--green)}
+.task-main{flex:1}.task-title{font-weight:700;font-size:13px}.task-meta{font-size:11px;color:var(--muted);margin-top:3px}
+.person{display:flex;align-items:center;gap:8px}
+.person .avatar{width:29px;height:29px;font-size:10px}
+.calendar{
+  display:grid;grid-template-columns:80px repeat(5,1fr);border:1px solid var(--line);border-radius:16px;overflow:hidden;background:white
+}
+.cal-head,.cal-time,.cal-cell{padding:10px;border-right:1px solid #edf1f3;border-bottom:1px solid #edf1f3;min-height:62px}
+.cal-head{background:#f7f9fa;text-align:center;font-size:12px;font-weight:800}
+.cal-time{font-size:11px;color:var(--muted)}
+.cal-cell{position:relative}
+.cal-event{font-size:11px;border-radius:8px;padding:6px;background:var(--blue-bg);color:var(--blue);border-left:3px solid var(--blue)}
+.cal-event.gold{background:#fff6df;color:#8a6418;border-color:var(--gold)}
+.cal-event.green{background:var(--green-bg);color:var(--green);border-color:var(--green)}
+.flow-wrap{display:flex;align-items:stretch;gap:8px;overflow:auto;padding:8px 2px 12px}
+.flow-node{
+  min-width:180px;background:#fff8cf;border:1px solid #eadf9e;border-radius:12px;padding:14px;
+  font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;text-align:center;min-height:80px
+}
+.flow-arrow{display:grid;place-items:center;color:#96a4ae;font-size:22px;min-width:22px}
+.meeting-card{display:flex;gap:14px;align-items:flex-start}
+.meeting-time{min-width:62px;background:var(--navy);color:white;border-radius:12px;padding:10px;text-align:center}
+.meeting-time b{font-size:16px}.meeting-time small{display:block;color:#bdcbd6}
+.meeting-body{flex:1}.meeting-body h4{margin:2px 0 4px}.meeting-body p{margin:0;color:var(--muted);font-size:12px}
+.org{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:14px
+}
+.dept{border:1px solid var(--line);background:white;border-radius:16px;padding:15px}
+.dept h4{margin:0 0 4px}.dept p{margin:0 0 12px;font-size:11px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}.chip{background:#f2f5f6;border-radius:999px;padding:6px 8px;font-size:10px}
+.toolbar{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+.toolbar select,.toolbar input{border:1px solid var(--line);background:white;border-radius:10px;padding:9px 11px}
+.split{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}
+.dossier-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}
+.tabs{display:flex;gap:6px;border-bottom:1px solid var(--line);margin-top:18px;overflow:auto}
+.tabs button{border:0;background:transparent;padding:11px 12px;font-weight:700;color:var(--muted);border-bottom:3px solid transparent}
+.tabs button.active{color:var(--navy);border-color:var(--gold)}
+.product-row{display:grid;grid-template-columns:2fr .6fr 1fr 1fr;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid #edf1f3;font-size:12px}
+.product-row:last-child{border:0}
+.notice{border-left:4px solid var(--orange);background:var(--orange-bg);padding:12px 14px;border-radius:10px;font-size:12px}
+.modal-backdrop{
+  position:fixed;inset:0;background:rgba(7,20,31,.55);display:none;align-items:center;justify-content:center;z-index:50;padding:20px
+}
+.modal-backdrop.open{display:flex}
+.modal{width:min(650px,100%);max-height:90vh;overflow:auto;background:white;border-radius:20px;box-shadow:0 30px 80px rgba(0,0,0,.25)}
+.modal-head{padding:20px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between}
+.modal-body{padding:20px 22px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}
+.field label{font-size:11px;font-weight:800;color:var(--muted)}
+.field input,.field select,.field textarea{border:1px solid var(--line);border-radius:10px;padding:10px}
+.modal-actions{display:flex;justify-content:flex-end;gap:9px;padding-top:16px}
+.mobile-menu{display:none}
+@media (max-width:1100px){
+  .grid-4{grid-template-columns:repeat(2,1fr)}
+  .org{grid-template-columns:repeat(2,1fr)}
+  .split{grid-template-columns:1fr}
+  .search{display:none}
+}
+@media (max-width:760px){
+  .sidebar{transform:translateX(-100%);transition:.2s}.sidebar.open{transform:translateX(0)}
+  .main{margin-left:0;width:100%}
+  .mobile-menu{display:grid}
+  .content{padding:18px}
+  .topbar{padding:0 16px}
+  .grid-4,.grid-3,.grid-2,.org{grid-template-columns:1fr}
+  .calendar{grid-template-columns:65px repeat(5,minmax(120px,1fr));overflow:auto}
+  .hero{align-items:flex-start;gap:18px;flex-direction:column}
+  .form-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <div class="logo">CV</div>
+        <div><h1>Chez Vous Gestão</h1><small>Eventos & Operações</small></div>
+      </div>
+    </div>
+    <nav class="nav" id="nav">
+      <button class="active" data-view="dashboard"><span class="icon">⌂</span> Visão geral</button>
+      <button data-view="events"><span class="icon">◇</span> Eventos</button>
+      <button data-view="production"><span class="icon">◫</span> Produção</button>
+      <button data-view="tasks"><span class="icon">✓</span> Tarefas</button>
+      <button data-view="agenda"><span class="icon">▦</span> Agenda</button>
+      <button data-view="processes"><span class="icon">⇢</span> Processos & Rotinas</button>
+      <button data-view="meetings"><span class="icon">◎</span> Reuniões</button>
+      <button data-view="team"><span class="icon">♙</span> Equipe</button>
+      <button data-view="departments"><span class="icon">▤</span> Departamentos</button>
+    </nav>
+    <div class="sidebar-footer">Protótipo funcional • Chez Vous<br>Versão conceitual 1.0</div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="icon-btn mobile-menu" id="mobileMenu">☰</button>
+        <div class="page-title" id="pageTitle">Visão geral</div>
+      </div>
+      <div class="top-actions">
+        <input class="search" placeholder="Buscar evento, tarefa, colaborador...">
+        <button class="icon-btn">🔔<span class="dot"></span></button>
+        <div class="avatar">AS</div>
+      </div>
+    </header>
+
+    <div class="content">
+      <!-- DASHBOARD -->
+      <section class="view active" id="dashboard">
+        <div class="hero">
+          <div>
+            <h2>Bom dia, Alisson.</h2>
+            <p>Hoje existem 3 eventos em preparação, 18 tarefas abertas e 4 pendências críticas.</p>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button class="btn ghost" data-open="taskModal">+ Nova tarefa</button>
+            <button class="btn gold" data-open="eventModal">+ Novo evento</button>
+          </div>
+        </div>
+
+        <div class="grid-4">
+          <div class="card kpi"><div><div class="label">Eventos próximos</div><div class="num">6</div></div><div class="badge-icon bg-blue">◇</div></div>
+          <div class="card kpi"><div><div class="label">Tarefas para hoje</div><div class="num">18</div></div><div class="badge-icon bg-orange">✓</div></div>
+          <div class="card kpi"><div><div class="label">Atrasadas</div><div class="num">4</div></div><div class="badge-icon bg-red">!</div></div>
+          <div class="card kpi"><div><div class="label">Aguardando validação</div><div class="num">7</div></div><div class="badge-icon bg-green">⌛</div></div>
+        </div>
+
+        <div class="split">
+          <div>
+            <div class="section-head"><h3>Eventos prioritários</h3><span class="sub">Preparação geral</span></div>
+            <div class="grid-2">
+              <div class="event-card">
+                <div class="event-top"><div><div class="event-title">Casamento • João & Ana</div><div class="event-meta">10/10/2026 • 200 convidados • Maison Bleu</div></div><span class="pill orange">D-9</span></div>
+                <div class="event-stats">
+                  <div class="mini-stat"><b>82%</b><span>Preparação</span></div>
+                  <div class="mini-stat"><b>5</b><span>Pendências</span></div>
+                  <div class="mini-stat"><b>14</b><span>Equipe</span></div>
+                </div>
+                <div style="margin-top:12px"><div class="progress"><span style="width:82%"></span></div></div>
+              </div>
+              <div class="event-card">
+                <div class="event-top"><div><div class="event-title">Formatura • Medicina</div><div class="event-meta">11/10/2026 • 500 convidados • Spazzio</div></div><span class="pill red">Atenção</span></div>
+                <div class="event-stats">
+                  <div class="mini-stat"><b>58%</b><span>Preparação</span></div>
+                  <div class="mini-stat"><b>11</b><span>Pendências</span></div>
+                  <div class="mini-stat"><b>27</b><span>Equipe</span></div>
+                </div>
+                <div style="margin-top:12px"><div class="progress"><span style="width:58%;background:var(--orange)"></span></div></div>
+              </div>
+            </div>
+
+            <div class="section-head"><h3>Meu dia</h3><span class="sub">1 de outubro de 2026</span></div>
+            <div class="card">
+              <div class="task-item"><div class="check"></div><div class="task-main"><div class="task-title">Validar checklist do casamento João & Ana</div><div class="task-meta">09:00 • Evento • Alta prioridade</div></div><span class="pill red">09:00</span></div>
+              <div class="task-item done"><div class="check">✓</div><div class="task-main"><div class="task-title">Reunião rápida com Produção</div><div class="task-meta">10:30 • Alinhamento operacional</div></div><span class="pill green">Concluída</span></div>
+              <div class="task-item"><div class="check"></div><div class="task-main"><div class="task-title">Revisar escala da formatura</div><div class="task-meta">14:00 • Gestão de Pessoas</div></div><span class="pill orange">14:00</span></div>
+              <div class="task-item"><div class="check"></div><div class="task-main"><div class="task-title">Reunião dos eventos da semana</div><div class="task-meta">16:00 • Gerência + líderes</div></div><span class="pill blue">16:00</span></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="section-head"><h3>Alertas da operação</h3><span class="sub">Atualizados agora</span></div>
+            <div class="card">
+              <div class="notice"><b>Formatura Medicina</b><br>Produção está em 51% e faltam 2 profissionais para confirmar.</div>
+              <div class="notice" style="margin-top:10px;border-color:var(--red);background:var(--red-bg)"><b>Tarefa vencida</b><br>Compra de gelo deveria ter sido concluída ontem às 17h.</div>
+              <div class="notice" style="margin-top:10px;border-color:var(--blue);background:var(--blue-bg)"><b>Aguardando validação</b><br>3 ordens de produção foram concluídas pela Doceria.</div>
+            </div>
+
+            <div class="section-head"><h3>Reuniões de hoje</h3><span class="sub">Rituais de gestão</span></div>
+            <div class="card">
+              <div class="meeting-card">
+                <div class="meeting-time"><b>10:30</b><small>15 min</small></div>
+                <div class="meeting-body"><h4>Alinhamento Produção</h4><p>Prioridades, bloqueios e produção do dia.</p></div>
+              </div>
+              <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
+              <div class="meeting-card">
+                <div class="meeting-time"><b>16:00</b><small>60 min</small></div>
+                <div class="meeting-body"><h4>Eventos da Semana</h4><p>Comercial, Produção, Operações, RH e Logística.</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- EVENTS -->
+      <section class="view" id="events">
+        <div class="hero">
+          <div><h2>Central de Eventos</h2><p>Do orçamento aprovado à execução e fechamento operacional.</p></div>
+          <button class="btn gold" data-open="eventModal">+ Novo evento</button>
+        </div>
+        <div class="toolbar">
+          <select><option>Todos os eventos</option><option>Casamentos</option><option>Formaturas</option><option>Corporativos</option></select>
+          <select><option>Próximos 30 dias</option><option>Esta semana</option><option>Este mês</option></select>
+          <input placeholder="Buscar cliente ou evento">
+        </div>
+
+        <div class="grid-3">
+          <div class="event-card" onclick="document.querySelector('[data-event-detail]').scrollIntoView({behavior:'smooth'})">
+            <div class="event-top"><div><div class="event-title">Casamento • João & Ana</div><div class="event-meta">10/10/2026 • 18:00 • Maison Bleu</div></div><span class="pill orange">D-9</span></div>
+            <div class="event-stats"><div class="mini-stat"><b>82%</b><span>Geral</span></div><div class="mini-stat"><b>91%</b><span>Produção</span></div><div class="mini-stat"><b>74%</b><span>Operação</span></div></div>
+          </div>
+          <div class="event-card">
+            <div class="event-top"><div><div class="event-title">Formatura • Medicina</div><div class="event-meta">11/10/2026 • 20:00 • Spazzio</div></div><span class="pill red">Crítico</span></div>
+            <div class="event-stats"><div class="mini-stat"><b>58%</b><span>Geral</span></div><div class="mini-stat"><b>51%</b><span>Produção</span></div><div class="mini-stat"><b>40%</b><span>Operação</span></div></div>
+          </div>
+          <div class="event-card">
+            <div class="event-top"><div><div class="event-title">Corporativo • Grupo Delta</div><div class="event-meta">15/10/2026 • 12:00 • Centro de Convenções</div></div><span class="pill green">No prazo</span></div>
+            <div class="event-stats"><div class="mini-stat"><b>43%</b><span>Geral</span></div><div class="mini-stat"><b>25%</b><span>Produção</span></div><div class="mini-stat"><b>35%</b><span>Operação</span></div></div>
+          </div>
+        </div>
+
+        <div class="section-head" data-event-detail><h3>Dossiê operacional — Casamento João & Ana</h3><span class="pill green">Orçamento aprovado</span></div>
+        <div class="card">
+          <div class="dossier-head">
+            <div>
+              <h2 style="margin:0 0 6px">Casamento João & Ana</h2>
+              <div style="color:var(--muted);font-size:13px">Evento CV-2026-045 • 200 convidados • 10/10/2026 • 18:00</div>
+            </div>
+            <div style="text-align:right"><b style="font-size:24px">82%</b><div style="color:var(--muted);font-size:11px">Preparação geral</div></div>
+          </div>
+          <div class="tabs">
+            <button class="active">Resumo</button><button>Orçamento</button><button>Produção</button><button>Equipe</button><button>Materiais</button><button>Checklists</button><button>Ocorrências</button>
+          </div>
+          <div class="grid-4" style="margin-top:18px">
+            <div class="mini-stat"><b>R$ 34.800</b><span>Valor do evento</span></div>
+            <div class="mini-stat"><b>23</b><span>Entregas operacionais</span></div>
+            <div class="mini-stat"><b>14</b><span>Profissionais</span></div>
+            <div class="mini-stat"><b>5</b><span>Pendências abertas</span></div>
+          </div>
+
+          <div class="section-head"><h3>Cronograma mestre</h3><span class="sub">Planejamento reverso pelo dia do evento</span></div>
+          <div class="timeline">
+            <div class="stage done"><small>D-7 • 03/10</small><b>Briefing validado</b></div><div class="arrow">→</div>
+            <div class="stage done"><small>D-5 • 05/10</small><b>Compras iniciais</b></div><div class="arrow">→</div>
+            <div class="stage active"><small>D-2 • 08/10</small><b>Início da produção</b></div><div class="arrow">→</div>
+            <div class="stage"><small>D-1 • 09/10</small><b>Separação & expedição</b></div><div class="arrow">→</div>
+            <div class="stage"><small>D0 • 10/10</small><b>Montagem & evento</b></div><div class="arrow">→</div>
+            <div class="stage locked"><small>D+1 • 11/10</small><b>Conferência & fechamento</b></div>
+          </div>
+
+          <div class="section-head"><h3>Entregas do orçamento</h3><span class="sub">Transformadas em execução</span></div>
+          <div class="product-row" style="font-weight:800;color:var(--muted)"><div>Item</div><div>Qtd.</div><div>Setor</div><div>Status</div></div>
+          <div class="product-row"><div>Brigadeiro gourmet</div><div>300 un.</div><div>Doceria</div><div><span class="pill green">Programado</span></div></div>
+          <div class="product-row"><div>Salgados especiais</div><div>700 un.</div><div>Salgados</div><div><span class="pill orange">Em produção</span></div></div>
+          <div class="product-row"><div>Jantar principal</div><div>200 px.</div><div>Cozinha</div><div><span class="pill gray">Aguardando</span></div></div>
+          <div class="product-row"><div>Equipe de garçons</div><div>10 prof.</div><div>Operações</div><div><span class="pill green">Confirmada</span></div></div>
+        </div>
+      </section>
+
+      <!-- PRODUCTION -->
+      <section class="view" id="production">
+        <div class="hero"><div><h2>Central de Produção</h2><p>Ordens de produção por evento, ficha técnica, prazo e responsável.</p></div><button class="btn gold">+ Ordem de produção</button></div>
+        <div class="grid-4">
+          <div class="card kpi"><div><div class="label">Produzir hoje</div><div class="num">12</div></div><div class="badge-icon bg-orange">◫</div></div>
+          <div class="card kpi"><div><div class="label">Em produção</div><div class="num">5</div></div><div class="badge-icon bg-blue">▶</div></div>
+          <div class="card kpi"><div><div class="label">Finalizadas</div><div class="num">19</div></div><div class="badge-icon bg-green">✓</div></div>
+          <div class="card kpi"><div><div class="label">Com atraso</div><div class="num">2</div></div><div class="badge-icon bg-red">!</div></div>
+        </div>
+        <div class="section-head"><h3>Produção de hoje</h3><span class="sub">01/10/2026</span></div>
+        <div class="card">
+          <table>
+            <thead><tr><th>Produto</th><th>Evento</th><th>Quantidade</th><th>Responsável</th><th>Prazo</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td><b>Brigadeiro gourmet</b><br><span style="color:var(--muted);font-size:11px">FT-DO-014</span></td><td>Casamento João & Ana</td><td>300 un.</td><td><div class="person"><div class="avatar">MA</div>Maria</div></td><td>15:00</td><td><span class="pill orange">Em produção</span></td></tr>
+              <tr><td><b>Mini quiche</b><br><span style="color:var(--muted);font-size:11px">FT-SA-028</span></td><td>Formatura Medicina</td><td>600 un.</td><td><div class="person"><div class="avatar">PE</div>Pedro</div></td><td>17:00</td><td><span class="pill blue">A iniciar</span></td></tr>
+              <tr><td><b>Molho base</b><br><span style="color:var(--muted);font-size:11px">FT-CO-006</span></td><td>Corporativo Delta</td><td>120 porções</td><td><div class="person"><div class="avatar">CA</div>Carlos</div></td><td>14:30</td><td><span class="pill green">Concluída</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TASKS -->
+      <section class="view" id="tasks">
+        <div class="hero"><div><h2>Gestão de Tarefas</h2><p>Delegação, execução, validação e rastreabilidade.</p></div><button class="btn gold" data-open="taskModal">+ Nova tarefa</button></div>
+        <div class="toolbar"><select><option>Todos os setores</option><option>Produção</option><option>Operações</option><option>Comercial</option><option>RH</option></select><select><option>Todos os status</option><option>A fazer</option><option>Em andamento</option><option>Bloqueada</option><option>Em validação</option></select><input placeholder="Buscar tarefa"></div>
+        <div class="grid-3">
+          <div class="card"><div class="section-head" style="margin-top:0"><h3>A fazer</h3><span class="pill gray">6</span></div>
+            <div class="task-item"><div class="check"></div><div class="task-main"><div class="task-title">Conferir louças do casamento</div><div class="task-meta">Operações • João • Hoje 15h</div></div><span class="pill red">Alta</span></div>
+            <div class="task-item"><div class="check"></div><div class="task-main"><div class="task-title">Confirmar 2 copeiros</div><div class="task-meta">RH • Sarah • Hoje 17h</div></div><span class="pill orange">Média</span></div>
+          </div>
+          <div class="card"><div class="section-head" style="margin-top:0"><h3>Em andamento</h3><span class="pill blue">4</span></div>
+            <div class="task-item"><div class="check"></div><div class="task-main"><div class="task-title">Produzir 300 brigadeiros</div><div class="task-meta">Doceria • Maria • 62% concluído</div></div><span class="pill blue">62%</span></div>
+            <div class="task-item"><div class="check"></div><div class="task-main"><div class="task-title">Montar lista de compras</div><div class="task-meta">Estoque • Paulo • Prazo 12h</div></div><span class="pill orange">Hoje</span></div>
+          </div>
+          <div class="card"><div class="section-head" style="margin-top:0"><h3>Validação</h3><span class="pill green">3</span></div>
+            <div class="task-item"><div class="check"></div><div class="task-main"><div class="task-title">Organização do estoque</div><div class="task-meta">Concluída por Carlos • validar</div></div><button class="btn" style="padding:7px 9px">Validar</button></div>
+            <div class="task-item"><div class="check"></div><div class="task-main"><div class="task-title">Checklist da rouparia</div><div class="task-meta">Concluída por Ana • validar</div></div><button class="btn" style="padding:7px 9px">Validar</button></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- AGENDA -->
+      <section class="view" id="agenda">
+        <div class="hero"><div><h2>Agenda Operacional</h2><p>Eventos, reuniões, produção e tarefas em uma única visão.</p></div><button class="btn gold">+ Compromisso</button></div>
+        <div class="toolbar"><button class="btn secondary">Hoje</button><button class="btn secondary">Semana</button><button class="btn secondary">Mês</button><select><option>Agenda da empresa</option><option>Minha agenda</option><option>Produção</option><option>Operações</option></select></div>
+        <div class="calendar">
+          <div class="cal-head"></div><div class="cal-head">Seg 28</div><div class="cal-head">Ter 29</div><div class="cal-head">Qua 30</div><div class="cal-head">Qui 01</div><div class="cal-head">Sex 02</div>
+          <div class="cal-time">08:00</div><div class="cal-cell"><div class="cal-event green">Reunião rápida</div></div><div class="cal-cell"></div><div class="cal-cell"><div class="cal-event">Conferência estoque</div></div><div class="cal-cell"><div class="cal-event gold">Produção brigadeiros</div></div><div class="cal-cell"></div>
+          <div class="cal-time">10:00</div><div class="cal-cell"></div><div class="cal-cell"><div class="cal-event gold">Degustação</div></div><div class="cal-cell"></div><div class="cal-cell"><div class="cal-event green">Alinhamento Produção</div></div><div class="cal-cell"></div>
+          <div class="cal-time">14:00</div><div class="cal-cell"><div class="cal-event">Planejamento semanal</div></div><div class="cal-cell"></div><div class="cal-cell"><div class="cal-event gold">Compras</div></div><div class="cal-cell"><div class="cal-event">Revisar escala</div></div><div class="cal-cell"></div>
+          <div class="cal-time">16:00</div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"><div class="cal-event green">Eventos da Semana</div></div><div class="cal-cell"><div class="cal-event gold">Separação</div></div>
+        </div>
+      </section>
+
+      <!-- PROCESSES -->
+      <section class="view" id="processes">
+        <div class="hero"><div><h2>Processos & Rotinas</h2><p>Fluxos recorrentes que geram tarefas e controlam dependências.</p></div><button class="btn gold">+ Novo processo</button></div>
+
+        <div class="section-head"><h3>Rotina pós-eventos e preparação da semana</h3><span class="pill blue">Semanal</span></div>
+        <div class="card">
+          <div class="flow-wrap">
+            <div class="flow-node">Organizar materiais dos eventos do fim de semana</div><div class="flow-arrow">→</div>
+            <div class="flow-node">Colocar o carro para lavar</div><div class="flow-arrow">→</div>
+            <div class="flow-node">Recolher materiais de rouparia</div><div class="flow-arrow">→</div>
+            <div class="flow-node">Organizar estoque e receber materiais</div><div class="flow-arrow">→</div>
+            <div class="flow-node">Solicitar leite, gelo e água mineral</div><div class="flow-arrow">→</div>
+            <div class="flow-node">Levantar lista de compras</div><div class="flow-arrow">→</div>
+            <div class="flow-node">Limpeza geral ASG</div><div class="flow-arrow">→</div>
+            <div class="flow-node">Limpeza geral da cozinha</div><div class="flow-arrow">→</div>
+            <div class="flow-node">Início da produção</div>
+          </div>
+          <div class="grid-4" style="margin-top:12px">
+            <div class="mini-stat"><b>9</b><span>Etapas</span></div><div class="mini-stat"><b>5</b><span>Setores envolvidos</span></div><div class="mini-stat"><b>Semanal</b><span>Frequência</span></div><div class="mini-stat"><b>Segunda 07h</b><span>Gatilho</span></div>
+          </div>
+        </div>
+
+        <div class="section-head"><h3>Rituais de gestão</h3><span class="sub">Fluxo de alinhamento</span></div>
+        <div class="card">
+          <div class="flow-wrap">
+            <div class="flow-node">Reunião estratégica de Marketing e Comercial</div><div class="flow-arrow">→</div>
+            <div class="flow-node">Reunião estratégica de Gestão de Pessoas</div><div class="flow-arrow">→</div>
+            <div class="flow-node">Reunião estratégica dos eventos da semana</div><div class="flow-arrow">→</div>
+            <div class="flow-node">Checklist final dos eventos</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MEETINGS -->
+      <section class="view" id="meetings">
+        <div class="hero"><div><h2>Reuniões & Rituais</h2><p>Pauta, decisões, responsáveis, prazos e geração automática de tarefas.</p></div><button class="btn gold">+ Nova reunião</button></div>
+        <div class="grid-3">
+          <div class="card">
+            <span class="pill blue">Estratégica</span><h3>Marketing & Comercial</h3><p style="font-size:12px;color:var(--muted)">Leads, orçamentos, propostas, contratos, degustações e próximos eventos.</p>
+            <div class="mini-stat"><b>Segunda • 09:00</b><span>Recorrência semanal</span></div>
+          </div>
+          <div class="card">
+            <span class="pill purple">Tática</span><h3>Gestão de Pessoas</h3><p style="font-size:12px;color:var(--muted)">Escala, extras, treinamentos, folgas e capacidade da equipe.</p>
+            <div class="mini-stat"><b>Quarta • 15:00</b><span>Recorrência semanal</span></div>
+          </div>
+          <div class="card">
+            <span class="pill orange">Operacional</span><h3>Eventos da Semana</h3><p style="font-size:12px;color:var(--muted)">Produção, compras, estoque, logística, equipe, riscos e checklist final.</p>
+            <div class="mini-stat"><b>Quinta • 16:00</b><span>Recorrência semanal</span></div>
+          </div>
+        </div>
+        <div class="section-head"><h3>Próxima reunião — Eventos da Semana</h3><span class="pill orange">Hoje • 16:00</span></div>
+        <div class="card">
+          <table><thead><tr><th>Pauta</th><th>Responsável</th><th>Situação</th></tr></thead>
+          <tbody>
+            <tr><td>Casamento João & Ana — produção</td><td>Maria / Pedro</td><td><span class="pill green">Preparado</span></td></tr>
+            <tr><td>Formatura Medicina — escala</td><td>RH / Operações</td><td><span class="pill red">2 pessoas pendentes</span></td></tr>
+            <tr><td>Materiais e compras da semana</td><td>Estoque</td><td><span class="pill orange">Revisar</span></td></tr>
+          </tbody></table>
+        </div>
+      </section>
+
+      <!-- TEAM -->
+      <section class="view" id="team">
+        <div class="hero"><div><h2>Equipe & Responsabilidades</h2><p>Cada colaborador possui login, setor, função, gestor e demandas próprias.</p></div><button class="btn gold">+ Colaborador</button></div>
+        <div class="grid-4">
+          <div class="card"><div class="person"><div class="avatar">MA</div><div><b>Maria Alves</b><div class="event-meta">Doceria • Produção</div></div></div><div style="margin-top:14px"><span class="pill orange">4 tarefas hoje</span></div></div>
+          <div class="card"><div class="person"><div class="avatar">PE</div><div><b>Pedro Lima</b><div class="event-meta">Salgados • Produção</div></div></div><div style="margin-top:14px"><span class="pill blue">6 tarefas hoje</span></div></div>
+          <div class="card"><div class="person"><div class="avatar">JO</div><div><b>João Santos</b><div class="event-meta">Operações • Líder</div></div></div><div style="margin-top:14px"><span class="pill green">2 validações</span></div></div>
+          <div class="card"><div class="person"><div class="avatar">SA</div><div><b>Sarah Costa</b><div class="event-meta">Gestão de Pessoas</div></div></div><div style="margin-top:14px"><span class="pill red">1 pendência crítica</span></div></div>
+        </div>
+        <div class="section-head"><h3>Carga de trabalho</h3><span class="sub">Tarefas abertas por colaborador</span></div>
+        <div class="card"><table><thead><tr><th>Colaborador</th><th>Setor</th><th>Hoje</th><th>Atrasadas</th><th>Em validação</th></tr></thead>
+          <tbody><tr><td>Maria Alves</td><td>Doceria</td><td>4</td><td>0</td><td>1</td></tr><tr><td>Pedro Lima</td><td>Salgados</td><td>6</td><td>1</td><td>0</td></tr><tr><td>João Santos</td><td>Operações</td><td>5</td><td>1</td><td>2</td></tr><tr><td>Sarah Costa</td><td>RH</td><td>3</td><td>0</td><td>0</td></tr></tbody>
+        </table></div>
+      </section>
+
+      <!-- DEPARTMENTS -->
+      <section class="view" id="departments">
+        <div class="hero"><div><h2>Estrutura Organizacional</h2><p>Departamentos, responsáveis, funções e pessoas vinculadas.</p></div><button class="btn gold">+ Departamento</button></div>
+        <div class="org">
+          <div class="dept"><h4>Comercial & Experiência</h4><p>Responsável: Coordenação Comercial</p><div class="chips"><span class="chip">Atendimento</span><span class="chip">Orçamentos</span><span class="chip">Cerimonial</span><span class="chip">Pós-evento</span></div></div>
+          <div class="dept"><h4>Produção Gastronômica</h4><p>Responsável: Líder de Produção</p><div class="chips"><span class="chip">Cozinha</span><span class="chip">Salgados</span><span class="chip">Doceria</span><span class="chip">Produção Eventos</span></div></div>
+          <div class="dept"><h4>Operações & Eventos</h4><p>Responsável: Líder de Operações</p><div class="chips"><span class="chip">Estoque</span><span class="chip">Logística</span><span class="chip">Montagem</span><span class="chip">Equipe Eventos</span></div></div>
+          <div class="dept"><h4>Administrativo / Financeiro</h4><p>Responsável: Gerência Geral</p><div class="chips"><span class="chip">Financeiro</span><span class="chip">Compras</span><span class="chip">Contratos</span></div></div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL TASK -->
+<div class="modal-backdrop" id="taskModal">
+  <div class="modal">
+    <div class="modal-head"><div><b>Nova tarefa</b><div class="event-meta">Delegar uma demanda operacional</div></div><button class="icon-btn" data-close>×</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field full"><label>TÍTULO</label><input value="Conferir materiais do casamento"></div>
+        <div class="field"><label>DEPARTAMENTO</label><select><option>Operações & Eventos</option><option>Produção Gastronômica</option><option>Comercial</option><option>RH</option></select></div>
+        <div class="field"><label>RESPONSÁVEL</label><select><option>João Santos</option><option>Maria Alves</option><option>Pedro Lima</option></select></div>
+        <div class="field"><label>EVENTO / PROJETO</label><select><option>Casamento João & Ana</option><option>Formatura Medicina</option></select></div>
+        <div class="field"><label>PRIORIDADE</label><select><option>Alta</option><option>Média</option><option>Baixa</option></select></div>
+        <div class="field"><label>PRAZO</label><input type="datetime-local" value="2026-10-01T17:00"></div>
+        <div class="field"><label>VALIDADOR</label><select><option>Líder de Operações</option><option>Gerência Geral</option></select></div>
+        <div class="field full"><label>DESCRIÇÃO / CRITÉRIO DE CONCLUSÃO</label><textarea rows="4">Conferir louças, bandejas e equipamentos. Registrar faltas e anexar foto final.</textarea></div>
+      </div>
+      <div class="modal-actions"><button class="btn secondary" data-close>Cancelar</button><button class="btn">Criar e delegar</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EVENT -->
+<div class="modal-backdrop" id="eventModal">
+  <div class="modal">
+    <div class="modal-head"><div><b>Novo evento</b><div class="event-meta">Criar Ordem de Evento a partir do orçamento aprovado</div></div><button class="icon-btn" data-close>×</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field"><label>CLIENTE</label><input placeholder="Nome do cliente"></div>
+        <div class="field"><label>TIPO</label><select><option>Casamento</option><option>Formatura</option><option>Corporativo</option><option>Aniversário</option></select></div>
+        <div class="field"><label>DATA DO EVENTO</label><input type="date" value="2026-10-10"></div>
+        <div class="field"><label>HORÁRIO</label><input type="time" value="18:00"></div>
+        <div class="field"><label>LOCAL</label><input placeholder="Local do evento"></div>
+        <div class="field"><label>CONVIDADOS</label><input type="number" value="200"></div>
+        <div class="field"><label>RESPONSÁVEL COMERCIAL</label><select><option>Comercial 01</option><option>Comercial 02</option></select></div>
+        <div class="field"><label>VALOR</label><input value="R$ 34.800,00"></div>
+        <div class="field full"><label>ORÇAMENTO / FICHA TÉCNICA</label><input type="file"></div>
+      </div>
+      <div class="modal-actions"><button class="btn secondary" data-close>Cancelar</button><button class="btn">Criar Ordem de Evento</button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const titles = {
+  dashboard:'Visão geral', events:'Eventos', production:'Produção', tasks:'Tarefas',
+  agenda:'Agenda', processes:'Processos & Rotinas', meetings:'Reuniões',
+  team:'Equipe', departments:'Departamentos'
+};
+document.querySelectorAll('#nav button').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('#nav button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.getElementById(btn.dataset.view).classList.add('active');
+    document.getElementById('pageTitle').textContent=titles[btn.dataset.view];
+    document.getElementById('sidebar').classList.remove('open');
+    window.scrollTo({top:0,behavior:'smooth'});
+  })
+});
+document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>document.getElementById(b.dataset.open).classList.add('open')));
+document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>b.closest('.modal-backdrop').classList.remove('open')));
+document.querySelectorAll('.modal-backdrop').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
+document.getElementById('mobileMenu').addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('open'));
+document.querySelectorAll('.task-item .check').forEach(c=>c.addEventListener('click',()=>{
+  const item=c.closest('.task-item'); item.classList.toggle('done'); c.textContent=item.classList.contains('done')?'✓':'';
+}));
+document.querySelectorAll('.tabs button').forEach(t=>t.addEventListener('click',()=>{
+  t.parentElement.querySelectorAll('button').forEach(x=>x.classList.remove('active')); t.classList.add('active');
+}));
+</script>
+</body>
+</html>
